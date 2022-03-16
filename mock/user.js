@@ -41,7 +41,7 @@ module.exports = [
       }
 
       return {
-        code: 20000,
+        code: 0,
         data: token
       }
     }
@@ -53,6 +53,7 @@ module.exports = [
     type: 'get',
     response: config => {
       const { token } = config.query
+      console.log(config.query, users[token])
       const info = users[token]
 
       // mock error
@@ -64,7 +65,7 @@ module.exports = [
       }
 
       return {
-        code: 20000,
+        code: 0,
         data: info
       }
     }
@@ -76,7 +77,7 @@ module.exports = [
     type: 'post',
     response: _ => {
       return {
-        code: 20000,
+        code: 0,
         data: 'success'
       }
     }

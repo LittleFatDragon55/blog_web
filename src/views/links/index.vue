@@ -3,18 +3,29 @@
     <div>
       <el-form ref="form" :model="form" class="form">
         <el-form-item>
+        <el-row :gutter="10">
           <el-col :span="5">
-            <el-input v-model="form.keyword" placeholder="关键字搜索"/>
+            <el-input v-model="form.keyword" placeholder="链接名"/>
+          </el-col>
+          <el-col :span="5">
+            <el-select v-model="form.category" style="width:100%" placeholder="选择类型">
+              <el-option label="全部" value="全部"></el-option>
+              <el-option label="其他链接" value="其他链接"></el-option>
+              <el-option label="博主链接" value="博主链接"></el-option>
+            </el-select>
           </el-col>
           <el-col :span="2">
             <el-button type="primary" @click="search" style="margin-right: 10px;">查询</el-button>
           </el-col>
-
+          <el-col :span="2">
+            <el-tag type="success" @click="addtag({})" class="taghover">新增</el-tag>
+          </el-col>
+        </el-row>
         </el-form-item>
-        <el-form-item>
-          <el-tag type="success" @click="addtag({})" class="taghover">新增</el-tag>
-          <el-tag type="danger" @click="delete_tag({})" class="taghover">删除</el-tag>
-        </el-form-item>
+<!--        <el-form-item>-->
+<!--          <el-tag type="success" @click="addtag({})" class="taghover">新增</el-tag>-->
+<!--          <el-tag type="danger" @click="delete_tag({})" class="taghover">删除</el-tag>-->
+<!--        </el-form-item>-->
       </el-form>
     </div>
     <div>
@@ -27,20 +38,24 @@
         highlight-current-row
         @selection-change="handleSelectionChange"
       >
-        <el-table-column
-          type="selection"
-          width="55">
-        </el-table-column>
-        <el-table-column align="center" label="id" width="95" prop="id" sortable>
+        <!--        <el-table-column-->
+        <!--          type="selection"-->
+        <!--          width="55">-->
+        <!--        </el-table-column>-->
+        <el-table-column align="center" label="链接名" width="95" prop="id" >
         </el-table-column>
 
-        <el-table-column label="分类名" align="center" prop="name">
+        <el-table-column label="图标" align="center" prop="name">
         </el-table-column>
-        <el-table-column label="描述" align="center" prop="desc">
+        <el-table-column label="url" align="center" prop="desc">
         </el-table-column>
-        <el-table-column label="图标" align="center" prop="icon">
+        <el-table-column label="描述" align="center" prop="icon">
         </el-table-column>
-        <el-table-column label="创建时间" align="center" prop="create_time">
+        <el-table-column label="类型" align="center" prop="icon">
+        </el-table-column>
+        <el-table-column label="状态" align="center" prop="icon">
+        </el-table-column>
+        <el-table-column label="创建时间" align="center" prop="create_time" sortable>
           <template slot-scope="scope">
             <span>{{ scope.row.create_time.split("T")[0] }}</span>
           </template>
@@ -67,13 +82,22 @@
     <div>
       <el-dialog :title="title" :visible.sync="show">
         <el-form :model="add_data" label-width="120px">
-          <el-form-item label="标签名称" >
+          <el-form-item label="链接名" >
             <el-input v-model="add_data.name"></el-input>
           </el-form-item>
-          <el-form-item label="标签描述">
+          <el-form-item label="链接图标">
             <el-input v-model="add_data.desc"></el-input>
           </el-form-item>
-          <el-form-item label="标签图标">
+          <el-form-item label="链接">
+            <el-input v-model="add_data.icon"></el-input>
+          </el-form-item>
+          <el-form-item label="链接类型">
+            <el-select v-model="form.category" style="width:100%" placeholder="选择类型">
+              <el-option label="其他链接" value="其他链接"></el-option>
+              <el-option label="博主链接" value="博主链接"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="链接描述">
             <el-input v-model="add_data.icon"></el-input>
           </el-form-item>
         </el-form>
@@ -92,7 +116,7 @@ export default {
   data() {
     return {
       list: null,
-      listLoading: true,
+      listLoading: false,
       form: {
         keyword: "",
       },
@@ -103,7 +127,7 @@ export default {
       add_data: {
         name: "",
         desc: "",
-icon:""
+        icon:""
       },
       show: false,
       title: "新增用户",
@@ -116,21 +140,22 @@ icon:""
   },
   methods: {
     listData() {
-      this.listLoading = true
-      this.axios.get("/api/tag/list_tag", {
-        params: {
-          keyword: this.form.keyword,
-          pageSize: this.pageSize,
-          currentPage: this.currentPage
-        }
-      }).then(res => {
-        console.log(res.data)
-        this.list = res.data.data
-        this.total = res.data.total
-        this.listLoading = false
-      }).catch(err => {
-        console.log(err)
-      })
+      // this.listLoading = true
+      this.list=[]
+      // this.axios.get("/api/tag/list_tag", {
+      //   params: {
+      //     keyword: this.form.keyword,
+      //     pageSize: this.pageSize,
+      //     currentPage: this.currentPage
+      //   }
+      // }).then(res => {
+      //   console.log(res.data)
+      //   this.list = res.data.data
+      //   this.total = res.data.total
+      //   this.listLoading = false
+      // }).catch(err => {
+      //   console.log(err)
+      // })
     },
     search() {
       this.listData()
@@ -151,7 +176,7 @@ icon:""
         this.add_data.name = row.name
         this.add_data.desc = row.desc
         this.add_data.icon = row.icon
-          this.id = row.id
+        this.id = row.id
         this.isadd = false
       }
     },

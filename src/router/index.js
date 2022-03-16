@@ -103,7 +103,7 @@ export const constantRoutes = [
       meta: {title: "分类管理", icon: 'award'}
     }]
   },
-  {
+{
     path: '/tags',
     component: Layout,
     redirect: '/tags',
@@ -112,6 +112,38 @@ export const constantRoutes = [
       name: 'Tags',
       component: () => import('@/views/tags/index'),
       meta: {title: "标签管理", icon: 'tag'}
+    }]
+  },  {
+    path: '/comment',
+    component: Layout,
+    redirect: '/comment',
+    children: [{
+      path: 'comment',
+      name: 'Comment',
+      component: () => import('@/views/comment/index'),
+      meta: {title: "留言", icon: 'comment'}
+    }]
+  },
+  {
+    path: '/links',
+    component: Layout,
+    redirect: '/links',
+    children: [{
+      path: 'links',
+      name: 'Links',
+      component: () => import('@/views/links/index'),
+      meta: {title: "友情链接", icon: 'links'}
+    }]
+  },
+  {
+    path: '/time',
+    component: Layout,
+    redirect: '/time',
+    children: [{
+      path: 'time',
+      name: 'Time',
+      component: () => import('@/views/time/index'),
+      meta: {title: "时间轴", icon: 'time'}
     }]
   },
   {

@@ -4,7 +4,7 @@
       <el-form ref="form" :model="form" class="form">
         <el-form-item>
           <el-col :span="5">
-            <el-input v-model="form.name" placeholder="用户名"/>
+            <el-input v-model="form.username" placeholder="用户名"/>
           </el-col>
 
           <el-col :span="5">
@@ -41,7 +41,7 @@
         <el-table-column align="center" label="id" width="95" prop="id" sortable>
         </el-table-column>
 
-        <el-table-column label="用户名" align="center" prop="name">
+        <el-table-column label="用户名" align="center" prop="username">
         </el-table-column>
         <el-table-column label="邮箱" align="center" prop="email">
         </el-table-column>
@@ -111,7 +111,7 @@ export default {
       list: null,
       listLoading: true,
       form: {
-        name: "",
+        username: "",
         type: ""
       },
       pageSize: 10,
@@ -119,7 +119,7 @@ export default {
       total: 0,
       selectId: [],
       adduser_data: {
-        name: "",
+        username: "",
         type: "",
         phone: "",
         email: "",
@@ -143,7 +143,7 @@ export default {
       this.listLoading = true
       this.axios.get("/api/users/list", {
         params: {
-          name: this.form.name,
+          username: this.form.username,
           type: this.form.type,
           pageSize: this.pageSize,
           currentPage: this.currentPage
@@ -176,7 +176,7 @@ export default {
       if (row.id) {
         console.log(row.length)
 
-        this.adduser_data.name = row.name
+        this.adduser_data.username = row.username
         this.adduser_data.type = row.type,
           this.adduser_data.phone = row.phone
         this.adduser_data.email = row.email
@@ -190,7 +190,7 @@ export default {
       console.log(this.isadd)
       if (this.isadd) {
         this.axios.post("/api/users/register", {
-          name: this.adduser_data.name,
+          username: this.adduser_data.username,
           type: this.adduser_data.type,
           phone: this.adduser_data.phone,
           email: this.adduser_data.email,
@@ -206,9 +206,10 @@ export default {
           console.log(err)
         })
       } else {
+        console.log(this.adduser_data)
         this.axios.post("/api/users/update", {
           id: this.id,
-          name: this.adduser_data.name,
+          username: this.adduser_data.username,
           type: this.adduser_data.type,
           phone: this.adduser_data.phone,
           email: this.adduser_data.email,
@@ -227,7 +228,7 @@ export default {
       this.fetchData()
       this.show = false
       this.adduser_data = {
-        name: "",
+        username: "",
         type: "",
         phone: "",
         email: "",

@@ -2,7 +2,10 @@
 <div>
   <el-form :model="adduser_data">
     <el-form-item label="用户名" :label-width="formLabelWidth">
-      <el-input v-model="adduser_data.name"></el-input>
+      <el-input v-model="adduser_data.username"></el-input>
+    </el-form-item>
+    <el-form-item label="email" :label-width="formLabelWidth">
+      <el-input v-model="adduser_data.email"></el-input>
     </el-form-item>
     <el-form-item label="密码" :label-width="formLabelWidth">
       <el-input v-model="adduser_data.password"></el-input>

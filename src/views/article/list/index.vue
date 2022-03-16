@@ -4,13 +4,13 @@
       <el-form ref="form" :model="form" class="form">
         <el-form-item>
           <el-col :span="5">
-            <el-input v-model="form.name" placeholder="标题描述"/>
+            <el-input v-model="form.keyword" placeholder="关键字"/>
           </el-col>
 
           <el-col :span="5">
-            <el-select v-model="form.type" placeholder="选择状态">
-              <el-option label="管理员" value="1"/>
-              <el-option label="普通用户" value="2"/>
+            <el-select v-model="form.state" placeholder="选择状态">
+              <el-option label="发布" value="1"/>
+              <el-option label="草稿" value="0"/>
             </el-select>
           </el-col>
           <el-col :span="2">
@@ -19,8 +19,8 @@
 
         </el-form-item>
         <el-form-item>
-          <el-tag type="success" @click="adduser({})" class="taghover">新增</el-tag>
-          <el-tag type="danger" @click="delete_user({})" class="taghover">删除</el-tag>
+          <el-tag type="success" @click="add({})" class="taghover">新增</el-tag>
+          <el-tag type="danger" @click="deleteArticle({})" class="taghover">删除</el-tag>
         </el-form-item>
       </el-form>
     </div>
@@ -48,12 +48,18 @@
         <el-table-column label="描述" align="center" prop="desc">
         </el-table-column>
         <el-table-column label="标签" align="center" prop="tags">
+          <template slot-scope="scope">
+              <div v-for="item in scope.row.tags" :key="item._id">
+                <el-tag class="mx-1" size="small" effect="dark">{{ item.name }}</el-tag>
+              </div>
+          </template>
         </el-table-column>
         <el-table-column label="分类" align="center" prop="category">
-<!--          <template slot-scope="scope">-->
-<!--            <el-tag :type="scope.row.category | statusFilter">{{ scope.row.category == 1 ? "管理员" : "普通用户" }}</el-tag>-->
-
-<!--          </template>-->
+          <template slot-scope="scope">
+              <div v-for="item1 in scope.row.category" :key="item1._id">
+                <el-tag  class="mx-1" size="small" effect="dark">{{ item1.name }}</el-tag>
+              </div>
+          </template>
         </el-table-column>
         <el-table-column label="创建时间" align="center" prop="create_time">
           <template slot-scope="scope">
@@ -62,8 +68,8 @@
         </el-table-column>
         <el-table-column label="操作" align="center">
           <template slot-scope="scope">
-            <el-tag type="success" @click="adduser(scope.row)" class="taghover">修改</el-tag>
-            <el-tag type="danger" @click="delete_user(scope.row)" class="taghover">删除</el-tag>
+            <el-tag type="success" @click="add(scope.row)" class="taghover">修改</el-tag>
+            <el-tag type="danger" @click="deleteArticle(scope.row)" class="taghover">删除</el-tag>
           </template>
         </el-table-column>
       </el-table>
@@ -79,80 +85,68 @@
         </el-pagination>
       </div>
     </div>
-    <div>
-      <el-dialog :title="title" :visible.sync="show">
-        <Adduser :adduser_data="adduser_data"></Adduser>
+<!--    <div>-->
+      <el-dialog :title="title" :visible.sync="show" center>
+        <div style="height: 500px;overflow: auto">
+          <Add_article :add_data="add_data"></Add_article>
+        </div>
         <div slot="footer" class="dialog-footer">
           <el-button @click="show = false">取 消</el-button>
           <el-button type="primary" @click="submit">确 定</el-button>
         </div>
       </el-dialog>
-    </div>
+<!--    </div>-->
   </div>
 </template>
 
 <script>
-import {getList} from '@/api/table'
-import Adduser from "@/views/user/user_list/adduser";
+import Add_article from "@/views/article/addarticle/index";
 
 export default {
-  components: {Adduser},
-  filters: {
-    statusFilter(status) {
-      const statusMap = {
-        1: 'success',
-        2: 'gray',
-        // deleted: 'danger'
-      }
-      return statusMap[status]
-    }
-  },
+  components: {Add_article},
   data() {
     return {
       list: null,
       listLoading: true,
       form: {
-        name: "",
-        type: ""
+        keyword: "",
+        state: ""
       },
       pageSize: 10,
       currentPage: 1,
       total: 0,
       selectId: [],
-      adduser_data: {
-        name: "",
-        type: "",
-        phone: "",
-        email: "",
-        introduce: "",
-        password: "",
-      },
+      add_data: {},
       show: false,
-      title: "新增用户",
-      isadd: true,
-      id:''
+      title: "新增文章",
+      is_add: true,
+      id: '',
     }
-  },
-  comments: {
-    Adduser
   },
   created() {
     this.fetchData()
+  },
+  watch:{
+    show(newVal,oldVal){
+      if(newVal===false){
+        this.add_data={}
+      }
+    }
   },
   methods: {
     fetchData() {
       this.listLoading = true
       this.axios.get("/api/article/list", {
         params: {
-          // name: this.form.name,
-          // type: this.form.type,
+          keyword: this.form.keyword,
+          state: this.form.state,
           pageSize: this.pageSize,
-          currentPage: this.currentPage
+          pageNum: this.currentPage
         }
       }).then(res => {
         console.log(res.data)
-        this.list = res.data.data
-        this.total = res.data.total
+        this.list = res.data.data.list
+        this.total = res.data.data.count
         this.listLoading = false
       }).catch(err => {
         console.log(err)
@@ -172,71 +166,49 @@ export default {
       this.fetchData()
       console.log(`当前页: ${val}`);
     },
-    adduser(row) {
+    add(row) {
       this.show = true
       if (row.id) {
-        console.log(row.length)
-
-        this.adduser_data.name = row.name
-        this.adduser_data.type = row.type,
-          this.adduser_data.phone = row.phone
-        this.adduser_data.email = row.email
-        this.adduser_data.introduce = row.introduce
-        this.adduser_data.password = row.password
-        this.id = row.id
-        this.isadd = false
+        this.title="修改文章"
+        this.add_data = row
+        this.is_add = false
+        let tags= this.add_data.tags
+        let category = this.add_data.category
+        let arr = [],arr2 = []
+        tags.forEach(e=>{
+          arr.push(e._id)
+        })
+        category.forEach(e=>{
+          arr2.push(e._id)
+        })
+        this.add_data.tags = arr
+        this.add_data.category = arr2
+        this.add_data.keyword = this.add_data.keyword.join(",")
+      }else{
+        this.is_add = true
       }
     },
     submit() {
-      console.log(this.isadd)
-      if (this.isadd) {
-        this.axios.post("/api/users/register", {
-          name: this.adduser_data.name,
-          type: this.adduser_data.type,
-          phone: this.adduser_data.phone,
-          email: this.adduser_data.email,
-          introduce: this.adduser_data.introduce,
-          password: this.adduser_data.password,
-        }).then(res => {
-          if (res.data.code == 0) {
-            this.$message("添加成功")
-          } else {
-            this.$message("用户名已存在")
-          }
+      if(this.is_add){
+        this.axios.post("/api/article/add_article", this.add_data).then(res => {
+          this.$message("文章添加成功")
+          this.show = false
+          this.fetchData()
         }).catch(err => {
           console.log(err)
         })
-      } else {
-        this.axios.post("/api/users/update", {
-          id:this.id,
-          name: this.adduser_data.name,
-          type: this.adduser_data.type,
-          phone: this.adduser_data.phone,
-          email: this.adduser_data.email,
-          introduce: this.adduser_data.introduce,
-          password: this.adduser_data.password,
-        }).then(res => {
-          if (res.data.code == 0) {
-            this.$message("修改成功")
-          } else {
-            this.$message("用户名重复")
-          }
+      }else{
+        this.axios.post("/api/article/updateArticle", this.add_data).then(res => {
+          this.$message("文章修改成功")
+          this.show = false
+          this.fetchData()
         }).catch(err => {
           console.log(err)
         })
       }
-      this.fetchData()
-      this.show = false
-      this.adduser_data = {
-        name: "",
-        type: "",
-        phone: "",
-        email: "",
-        introduce: "",
-        password: "",
-      }
+
     },
-    delete_user(row) {
+    deleteArticle(row) {
       let ids = []
       this.$confirm('是否删除?', '提示', {
         confirmButtonText: '确定',
@@ -246,12 +218,12 @@ export default {
         if (row.id) {
           console.log(row)
           ids.push(row.id)
-        }else if (this.selectId.length > 0) {
+        } else if (this.selectId.length > 0) {
           ids = this.selectId
         } else {
           this.$message("请选择用户")
         }
-        this.axios.post("/api/users/delete", {"ids": ids}).then(res => {
+        this.axios.post("/api/article/delArticle", {"ids": ids}).then(res => {
           this.$message("删除成功")
           this.fetchData()
 
@@ -271,8 +243,8 @@ export default {
 }
 </script>
 <style scoped>
-.form .el-input {
-  width: 90%;
-}
+/*.form .el-input {*/
+/*  width: 90%;*/
+/*}*/
 
 </style>
