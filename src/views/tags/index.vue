@@ -12,8 +12,8 @@
 
         </el-form-item>
         <el-form-item>
-          <el-tag type="success" @click="addtag({})" class="taghover">新增</el-tag>
-          <el-tag type="danger" @click="delete_tag({})" class="taghover">删除</el-tag>
+          <el-tag type="success" @click="add_tag({})" class="tag_hover">新增</el-tag>
+          <el-tag type="danger" @click="delete_tag({})" class="tag_hover">删除</el-tag>
         </el-form-item>
       </el-form>
     </div>
@@ -41,14 +41,14 @@
         <el-table-column label="图标" align="center" prop="icon">
         </el-table-column>
         <el-table-column label="创建时间" align="center" prop="create_time">
-          <template slot-scope="scope">
+          <template v-slot="scope">
             <span>{{ scope.row.create_time.split("T")[0] }}</span>
           </template>
         </el-table-column>
         <el-table-column label="操作" align="center">
-          <template slot-scope="scope">
-            <el-tag type="success" @click="addtag(scope.row)" class="taghover">修改</el-tag>
-            <el-tag type="danger" @click="delete_tag(scope.row)" class="taghover">删除</el-tag>
+          <template v-slot="scope">
+            <el-tag type="success" @click="add_tag(scope.row)" class="tag_hover">修改</el-tag>
+            <el-tag type="danger" @click="delete_tag(scope.row)" class="tag_hover">删除</el-tag>
           </template>
         </el-table-column>
       </el-table>
@@ -107,7 +107,7 @@ icon:""
       },
       show: false,
       title: "新增用户",
-      isadd: true,
+      is_add: true,
       id:''
     }
   },
@@ -145,25 +145,25 @@ icon:""
       this.listData()
       console.log(`当前页: ${val}`);
     },
-    addtag(row) {
+    add_tag(row) {
       this.show = true
       if (row.id) {
         this.add_data.name = row.name
         this.add_data.desc = row.desc
         this.add_data.icon = row.icon
           this.id = row.id
-        this.isadd = false
+        this.is_add = false
       }
     },
     submit() {
-      console.log(this.isadd)
-      if (this.isadd) {
+      console.log(this.is_add)
+      if (this.is_add) {
         this.axios.post("/api/tag/add_tag", {
           name: this.add_data.name,
           desc: this.add_data.desc,
           icon:this.add_data.icon
         }).then(res => {
-          if (res.data.code == 0) {
+          if (res.data.code === 0) {
             this.$message("添加成功")
           } else {
             this.$message("分类名已存在")
@@ -178,7 +178,7 @@ icon:""
           desc: this.add_data.desc,
           icon:this.add_data.icon
         }).then(res => {
-          if (res.data.code == 0) {
+          if (res.data.code === 0) {
             this.$message("修改成功")
           } else {
             this.$message("分类名重复")
@@ -229,8 +229,6 @@ icon:""
 }
 </script>
 <style scoped>
-.form .el-input {
-  width: 90%;
-}
+
 
 </style>

@@ -12,8 +12,8 @@
 
         </el-form-item>
         <el-form-item>
-          <el-tag type="success" @click="addcategory({})" class="taghover">新增</el-tag>
-          <el-tag type="danger" @click="delete_category({})" class="taghover">删除</el-tag>
+          <el-tag type="success" @click="add_category({})" class="tag_hover">新增</el-tag>
+          <el-tag type="danger" @click="delete_category({})" class="tag_hover">删除</el-tag>
         </el-form-item>
       </el-form>
     </div>
@@ -39,14 +39,14 @@
         <el-table-column label="描述" align="center" prop="desc">
         </el-table-column>
         <el-table-column label="创建时间" align="center" prop="create_time">
-          <template slot-scope="scope">
+          <template v-slot="scope">
             <span>{{ scope.row.create_time.split("T")[0] }}</span>
           </template>
         </el-table-column>
         <el-table-column label="操作" align="center">
-          <template slot-scope="scope">
-            <el-tag type="success" @click="addcategory(scope.row)" class="taghover">修改</el-tag>
-            <el-tag type="danger" @click="delete_category(scope.row)" class="taghover">删除</el-tag>
+          <template v-slot="scope">
+            <el-tag type="success" @click="add_category(scope.row)" class="tag_hover">修改</el-tag>
+            <el-tag type="danger" @click="delete_category(scope.row)" class="tag_hover">删除</el-tag>
           </template>
         </el-table-column>
       </el-table>
@@ -65,7 +65,7 @@
     <div>
       <el-dialog :title="title" :visible.sync="show">
         <el-form :model="add_data" label-width="120px">
-          <el-form-item label="分类名称" >
+          <el-form-item label="分类名称">
             <el-input v-model="add_data.name"></el-input>
           </el-form-item>
           <el-form-item label="分类描述">
@@ -102,8 +102,8 @@ export default {
       },
       show: false,
       title: "新增用户",
-      isadd: true,
-      id:''
+      is_add: true,
+      id: ''
     }
   },
   created() {
@@ -140,25 +140,25 @@ export default {
       this.listData()
       console.log(`当前页: ${val}`);
     },
-    addcategory(row) {
+    add_category(row) {
       this.show = true
       if (row.id) {
         console.log(row.length)
 
         this.add_data.name = row.name
-        this.add_data.desc = row.desc,
+        this.add_data.desc = row.desc
         this.id = row.id
-        this.isadd = false
+        this.is_add = false
       }
     },
     submit() {
-      console.log(this.isadd)
-      if (this.isadd) {
+      console.log(this.is_add)
+      if (this.is_add) {
         this.axios.post("/api/category/add_category", {
           name: this.add_data.name,
           desc: this.add_data.desc,
         }).then(res => {
-          if (res.data.code == 0) {
+          if (res.data.code === 0) {
             this.$message("添加成功")
           } else {
             this.$message("分类名已存在")
@@ -168,11 +168,11 @@ export default {
         })
       } else {
         this.axios.post("/api/category/update_category", {
-          id:this.id,
+          id: this.id,
           name: this.add_data.name,
           desc: this.add_data.desc,
         }).then(res => {
-          if (res.data.code == 0) {
+          if (res.data.code === 0) {
             this.$message("修改成功")
           } else {
             this.$message("分类名重复")
@@ -198,14 +198,17 @@ export default {
         if (row.id) {
           console.log(row)
           ids.push(row.id)
-        }else if (this.selectId.length > 0) {
+        } else if (this.selectId.length > 0) {
           ids = this.selectId
         } else {
           this.$message("请选择分类")
         }
         this.axios.post("/api/category/delete_category", {"ids": ids}).then(res => {
-          this.$message("删除成功")
-          this.listData()
+          if (res.data.code === 0) {
+            this.$message("删除成功")
+            this.listData()
+          }
+
 
         }).catch(err => {
           console.log(err)
@@ -223,8 +226,6 @@ export default {
 }
 </script>
 <style scoped>
-.form .el-input {
-  width: 90%;
-}
+
 
 </style>

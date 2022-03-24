@@ -21,7 +21,7 @@
           <el-form-item>
             <el-select v-model="form.tags" multiple placeholder="请选择标签" style="width:100%">
               <el-option
-                v-for="item in tagoptions"
+                v-for="item in tag_options"
                 :key="item.name"
                 :label="item.name"
                 :value="item._id"
@@ -34,7 +34,7 @@
           <el-form-item>
             <el-select v-model="form.category" multiple placeholder="请选择分类" style="width:100%">
               <el-option
-                v-for="item in categoryoptions"
+                v-for="item in category_options"
                 :key="item.name"
                 :label="item.name"
                 :value="item._id"
@@ -120,8 +120,8 @@ export default {
           trigger: 'blur',
         }]
       },
-      tagoptions: [],
-      categoryoptions: [],
+      tag_options: [],
+      category_options: [],
       show: true
     }
   },
@@ -148,14 +148,14 @@ export default {
     },
     tag_list() {
       this.axios.get("/api/tag/list_tag",).then(res => {
-        this.tagoptions = res.data.data
+        this.tag_options = res.data.data
       }).catch(err => {
         console.log(err)
       })
     },
     category_list() {
       this.axios.get("/api/category/list_category",).then(res => {
-        this.categoryoptions = res.data.data
+        this.category_options = res.data.data
       }).catch(err => {
         console.log(err)
       })

@@ -19,8 +19,8 @@
 
         </el-form-item>
         <el-form-item>
-          <el-tag type="success" @click="adduser({})" class="taghover">新增</el-tag>
-          <el-tag type="danger" @click="delete_user({})" class="taghover">删除</el-tag>
+          <el-tag type="success" @click="adduser({})" class="tag_hover">新增</el-tag>
+          <el-tag type="danger" @click="delete_user({})" class="tag_hover">删除</el-tag>
         </el-form-item>
       </el-form>
     </div>
@@ -50,20 +50,20 @@
         <el-table-column label="个人介绍" align="center" prop="introduce">
         </el-table-column>
         <el-table-column label="类型" align="center" prop="type">
-          <template slot-scope="scope">
-            <el-tag :type="scope.row.type | statusFilter">{{ scope.row.type == 1 ? "管理员" : "普通用户" }}</el-tag>
+          <template v-slot="scope">
+            <el-tag :type="scope.row.type | statusFilter">{{ scope.row.type === 1 ? "管理员" : "普通用户" }}</el-tag>
 
           </template>
         </el-table-column>
         <el-table-column label="创建时间" align="center" prop="create_time">
-          <template slot-scope="scope">
+          <template v-slot="scope">
             <span>{{ scope.row.create_time.split("T")[0] }}</span>
           </template>
         </el-table-column>
         <el-table-column label="操作" align="center">
-          <template slot-scope="scope">
-            <el-tag type="success" @click="adduser(scope.row)" class="taghover">修改</el-tag>
-            <el-tag type="danger" @click="delete_user(scope.row)" class="taghover">删除</el-tag>
+          <template v-slot="scope">
+            <el-tag type="success" @click="adduser(scope.row)" class="tag_hover">修改</el-tag>
+            <el-tag type="danger" @click="delete_user(scope.row)" class="tag_hover">删除</el-tag>
           </template>
         </el-table-column>
       </el-table>
@@ -125,10 +125,11 @@ export default {
         email: "",
         introduce: "",
         password: "",
+        avatar:""
       },
       show: false,
       title: "新增用户",
-      isadd: true,
+      is_add: true,
       id: ''
     }
   },
@@ -177,18 +178,29 @@ export default {
         console.log(row.length)
 
         this.adduser_data.username = row.username
-        this.adduser_data.type = row.type,
+        this.adduser_data.type = row.type
           this.adduser_data.phone = row.phone
         this.adduser_data.email = row.email
         this.adduser_data.introduce = row.introduce
         this.adduser_data.password = row.password
+        this.adduser_data.avatar = row.avatar
         this.id = row.id
-        this.isadd = false
+        this.is_add = false
+      }else{
+        this.adduser_data={
+          username: "",
+            type: "",
+          phone: "",
+          email: "",
+          introduce: "",
+          password: "",
+          avatar:""
+        }
       }
     },
     submit() {
-      console.log(this.isadd)
-      if (this.isadd) {
+      console.log(this.is_add)
+      if (this.is_add) {
         this.axios.post("/api/users/register", {
           username: this.adduser_data.username,
           type: this.adduser_data.type,
@@ -196,8 +208,9 @@ export default {
           email: this.adduser_data.email,
           introduce: this.adduser_data.introduce,
           password: this.adduser_data.password,
+          avatar:this.adduser_data.avatar
         }).then(res => {
-          if (res.data.code == 0) {
+          if (res.data.code === 0) {
             this.$message("添加成功")
           } else {
             this.$message("用户名已存在")
@@ -215,8 +228,9 @@ export default {
           email: this.adduser_data.email,
           introduce: this.adduser_data.introduce,
           password: this.adduser_data.password,
+          avatar:this.adduser_data.avatar
         }).then(res => {
-          if (res.data.code == 0) {
+          if (res.data.code === 0) {
             this.$message("修改成功")
           } else {
             this.$message("用户名重复")
@@ -271,8 +285,5 @@ export default {
 }
 </script>
 <style scoped>
-.form .el-input {
-  width: 90%;
-}
 
 </style>

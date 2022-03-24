@@ -19,8 +19,8 @@
 
         </el-form-item>
         <el-form-item>
-          <el-tag type="success" @click="add({})" class="taghover">新增</el-tag>
-          <el-tag type="danger" @click="deleteArticle({})" class="taghover">删除</el-tag>
+          <el-tag type="success" @click="add({})" class="tag_hover">新增</el-tag>
+          <el-tag type="danger" @click="deleteArticle({})" class="tag_hover">删除</el-tag>
         </el-form-item>
       </el-form>
     </div>
@@ -48,28 +48,28 @@
         <el-table-column label="描述" align="center" prop="desc">
         </el-table-column>
         <el-table-column label="标签" align="center" prop="tags">
-          <template slot-scope="scope">
+          <template v-slot="scope">
               <div v-for="item in scope.row.tags" :key="item._id">
                 <el-tag class="mx-1" size="small" effect="dark">{{ item.name }}</el-tag>
               </div>
           </template>
         </el-table-column>
         <el-table-column label="分类" align="center" prop="category">
-          <template slot-scope="scope">
+          <template v-slot="scope">
               <div v-for="item1 in scope.row.category" :key="item1._id">
                 <el-tag  class="mx-1" size="small" effect="dark">{{ item1.name }}</el-tag>
               </div>
           </template>
         </el-table-column>
         <el-table-column label="创建时间" align="center" prop="create_time">
-          <template slot-scope="scope">
+          <template v-slot="scope">
             <span>{{ scope.row.create_time.split("T")[0] }}</span>
           </template>
         </el-table-column>
         <el-table-column label="操作" align="center">
-          <template slot-scope="scope">
-            <el-tag type="success" @click="add(scope.row)" class="taghover">修改</el-tag>
-            <el-tag type="danger" @click="deleteArticle(scope.row)" class="taghover">删除</el-tag>
+          <template v-slot="scope">
+            <el-tag type="success" @click="add(scope.row)" class="tag_hover">修改</el-tag>
+            <el-tag type="danger" @click="deleteArticle(scope.row)" class="tag_hover">删除</el-tag>
           </template>
         </el-table-column>
       </el-table>
